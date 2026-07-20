@@ -33,7 +33,7 @@ void Application::Input() {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
                 Body* smallBall = new Body(CircleShape(40), x, y, 1.0);
-                smallBall->restitution = 0.2;
+                smallBall->restitution = 0.9;
                 bodies.push_back(smallBall);
                 break;
             // case SDL_MOUSEMOTION:
@@ -141,7 +141,7 @@ void Application::Update() {
         // Vec2 drag = Force::GenerateDragForce(*body, 0.003);
         // body->AddForce(drag);
 
-        Vec2 weight = Vec2(0.0, body->mass * 9.8 * PIXELS_PER_METER);
+        Vec2 weight = Vec2(0.0, body->invMass * 9.8 * PIXELS_PER_METER);
         body->AddForce(weight);
 
         Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0.0);

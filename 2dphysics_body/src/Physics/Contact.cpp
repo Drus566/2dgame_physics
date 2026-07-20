@@ -1,7 +1,5 @@
 #include "Contact.h"
 
-#include <math.h>
-
 void Contact::ResolvePenetration() {
     if (a->IsStatic() && b->IsStatic()) return;
 
@@ -33,5 +31,5 @@ void Contact::ResolveCollision() {
 
     // Apply the impulse vector to both objects in opposite direction
     a->ApplyImpulse(jn);
-    a->ApplyImpulse(-jn);
+    b->ApplyImpulse(-jn);
 }

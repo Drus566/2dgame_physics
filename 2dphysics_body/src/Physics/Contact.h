@@ -19,6 +19,12 @@ struct Contact {
 
     void ResolvePenetration();
     void ResolveCollision();
+    
+    // void isOverlappingAABB() {
+    //     bool isOverlappingX = aLeft <= bRight && bLeft <= aRight;
+    //     bool isOverlappingY = aBottom <= bTop && bBottom <= aTop;
+    //     return isOverlappingX && isOverlappingY;
+    // }
 };
 
 #endif

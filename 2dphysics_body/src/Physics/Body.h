@@ -29,7 +29,7 @@ struct Body {
     float I;
     float invI;
 
-    // Coefficient of restitution (elasticity)
+    // Coefficient of restitution (elasticity)/возвращение
     float restitution;
 
     // Pointer to the shape/geometry of this rigid body
