@@ -11,8 +11,13 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();
 
-    Body* bigBall = new Body(CircleShape(200), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0);
-    bodies.push_back(bigBall);
+    Body* boxA = new Body(BoxShape(200,200), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 1.0);
+    Body* boxB = new Body(BoxShape(200,200), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 1.0);
+    boxA->angularVelocity = 0.4;
+    boxB->angularVelocity = 0.1;
+    bodies.push_back(boxA);
+    bodies.push_back(boxB);
+
     // Body* bigBall = new Body(CircleShape(100),100,100,1.0);
     // Body* smallBall = new Body(CircleShape(50),500,100,1.0);
     // bodies.push_back(bigBall);
@@ -29,13 +34,21 @@ void Application::Input() {
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE) running = false;
                 break;
-            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEMOTION:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                Body* smallBall = new Body(CircleShape(40), x, y, 1.0);
-                smallBall->restitution = 0.9;
-                bodies.push_back(smallBall);
+                bodies[0]->position.x = x;
+                bodies[0]->position.y = y;
                 break;
+
+            // case SDL_MOUSEBUTTONDOWN:
+            //     int x, y;
+            //     SDL_GetMouseState(&x, &y);
+            //     Body* smallBall = new Body(CircleShape(40), x, y, 1.0);
+            //     smallBall->restitution = 0.9;
+            //     bodies.push_back(smallBall);
+            //     break;
+
             // case SDL_MOUSEMOTION:
             //     int x, y;
             //     SDL_GetMouseState(&x, &y);
@@ -131,31 +144,31 @@ void Application::Update() {
     // bodies[0]->AddForce(pushForce);
 
     // body->acceleration = Vec2(0.0, 9.8 * PIXELS_PER_METER);
-    for (auto body : bodies) {
-        // Vec2 wind = Vec2(0.2 * PIXELS_PER_METER, 0.0); // ветер
-        // body->AddForce(wind);
-        // Vec2 weight = Vec2(0.0, body->mass * 9.8 * PIXELS_PER_METER); // Сила тяжести
-        // body->AddForce(weight);
-        // body->AddForce(pushForce); // Сила из клавиатуры
+    // for (auto body : bodies) {
+    //     // Vec2 wind = Vec2(0.2 * PIXELS_PER_METER, 0.0); // ветер
+    //     // body->AddForce(wind);
+    //     // Vec2 weight = Vec2(0.0, body->mass * 9.8 * PIXELS_PER_METER); // Сила тяжести
+    //     // body->AddForce(weight);
+    //     // body->AddForce(pushForce); // Сила из клавиатуры
 
-        // Vec2 drag = Force::GenerateDragForce(*body, 0.003);
-        // body->AddForce(drag);
+    //     // Vec2 drag = Force::GenerateDragForce(*body, 0.003);
+    //     // body->AddForce(drag);
 
-        Vec2 weight = Vec2(0.0, body->invMass * 9.8 * PIXELS_PER_METER);
-        body->AddForce(weight);
+    //     Vec2 weight = Vec2(0.0, body->invMass * 9.8 * PIXELS_PER_METER);
+    //     body->AddForce(weight);
 
-        Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0.0);
-        body->AddForce(wind);
+    //     Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0.0);
+    //     body->AddForce(wind);
 
-        // // Только если в воде
-        // // if (body->position.y >= liquid.y) {
-        // //     Vec2 drag = Force::GenerateDragForce(*body, 0.01);
-        // //     body->AddForce(drag);
-        // // }
+    //     // // Только если в воде
+    //     // // if (body->position.y >= liquid.y) {
+    //     // //     Vec2 drag = Force::GenerateDragForce(*body, 0.01);
+    //     // //     body->AddForce(drag);
+    //     // // }
 
-        // float torque = 200;
-        // body->AddTorque(torque);
-    }
+    //     // float torque = 200;
+    //     // body->AddTorque(torque);
+    // }
 
     for (auto body : bodies) {
         body->Update(deltaTime);
@@ -171,7 +184,7 @@ void Application::Update() {
             b->isColliding = false;
             Contact contact;
             if (CollisionDetection::isColliding(a, b, contact)) {
-                contact.ResolveCollision();
+                // contact.ResolveCollision();
 
                 Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
                 Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
@@ -218,11 +231,11 @@ void Application::Render() {
 
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*) body->shape;
-            Graphics::DrawFillCircle(body->position.x, body->position.y, circleShape->radius, 0xFFFFFFFF);
+            Graphics::DrawFillCircle(body->position.x, body->position.y, circleShape->radius, color);
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFFFFFFFF); 
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, color); 
         }
     }
 
