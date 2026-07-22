@@ -92,7 +92,7 @@ bool CollisionDetection::isCollidingPolygonPolygon(Body* a, Body* b, Contact& co
     else {
         contact.depth = -baSeparation;
         contact.normal = -bAxis.Normal();
-        contact.start = bPoint + contact.normal * contact.depth;
+        contact.start = bPoint - contact.normal * contact.depth;
         contact.end = bPoint;
     }
     return true;
