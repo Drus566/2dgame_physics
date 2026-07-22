@@ -41,7 +41,7 @@ struct PolygonShape: public Shape {
     // Function to rotate and translate the polygon vertices from "local space" to "world space."
     void UpdateVertices(float angle, const Vec2& position);
     Vec2 EdgeAt(int index) const;
-    float FindMinSeparation(const PolygonShape* other) const;
+    float FindMinSeparation(const PolygonShape* other, Vec2& axis, Vec2& point) const;
 };
 
 struct BoxShape: public PolygonShape {
