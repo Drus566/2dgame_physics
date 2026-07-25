@@ -22,8 +22,8 @@ void Application::Setup() {
     bodies.push_back(rightWall);
 
     Body* bigBox = new Body(BoxShape(200, 200), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0);
-    bigBox->restitution = 0.1;
-    bigBox->rotation = 1.4;
+    bigBox->restitution = 0;
+    bigBox->rotation = 1.7;
     bodies.push_back(bigBox);
 
     // Body* bigBall = new Body(CircleShape(100),100,100,1.0);
@@ -46,7 +46,7 @@ void Application::Input() {
                 int x, y;
                 SDL_GetMouseState(&x, &y);
                 Body* box = new Body(BoxShape(50, 50), x, y, 1.0);
-                box->restitution = 0.2;
+                box->restitution = 0.01;
                 bodies.push_back(box);
                 // bodies[0]->position.x = x;
                 // bodies[0]->position.y = y;
