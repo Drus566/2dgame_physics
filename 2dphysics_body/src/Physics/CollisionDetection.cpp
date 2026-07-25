@@ -13,6 +13,13 @@ bool CollisionDetection::isColliding(Body* a, Body* b, Contact& contact) {
     if (aIsPolygon && bIsPolygon) {
         return isCollidingPolygonPolygon(a, b, contact);
     }
+    if (aIsPolygon && bIsCircle) {
+        return isCollidingPolygonCircle(a, b, contact);
+    }
+    if (aIsCircle && bIsPolygon) {
+        return isCollidingPolygonCircle(b, a, contact);
+    }
+
     return false;
 }
 
@@ -95,5 +102,10 @@ bool CollisionDetection::isCollidingPolygonPolygon(Body* a, Body* b, Contact& co
         contact.start = bPoint - contact.normal * contact.depth;
         contact.end = bPoint;
     }
+    return true;
+}
+
+bool CollisionDetection::isCollidingPolygonCircle(Body* a, Body* b, Contact& contact) {
+
     return true;
 }
