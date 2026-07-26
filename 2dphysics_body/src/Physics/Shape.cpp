@@ -25,17 +25,21 @@ ShapeType CircleShape::GetType() const {
     return CIRCLE;
 };
 
-PolygonShape::PolygonShape(const std::vector<Vec2> verticles) {
-    // TODO
+PolygonShape::PolygonShape(const std::vector<Vec2> vertices) {
+    for (auto vertex: vertices) {
+        localVertices.push_back(vertex);
+        worldVertices.push_back(vertex);
+    }
+    std::cout << "PolygonShape constructor called!" << std::endl;
 };
 
 PolygonShape::~PolygonShape() {
-    // TODO
+    std::cout << "PolygonShape destructor called!" << std::endl;
 };
 
 float PolygonShape::GetMomentOfInertia() const {
     // TODO
-    return 0.0;
+    return 5000;
 }
 
 Vec2 PolygonShape::EdgeAt(int index) const {
@@ -69,7 +73,7 @@ float PolygonShape::FindMinSeparation(const PolygonShape* other, Vec2& axis, Vec
             axis = this->EdgeAt(i);
             point = minVertex;
         }
-        // separation = std::max(separation, minSep);
+        separation = std::max(separation, minSep);
     }
 
     // Return the best separation out of all the axis

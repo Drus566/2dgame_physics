@@ -45,14 +45,24 @@ void Application::Input() {
                 break;
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE) running = false;
+                if (event.key.keysym.sym == SDLK_d) debug = !debug;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 int x, y;
                 SDL_GetMouseState(&x, &y);
-                Body* ball = new Body(CircleShape(30), x, y, 1.0);
-                ball->restitution = 0.5;
-                ball->friction = 0.4;
-                bodies.push_back(ball);
+
+                std::vector<Vec2> vertices = {
+                    Vec2(20, 60),
+                    Vec2(-40, 20),
+                    Vec2(-20, -60),
+                    Vec2(20, -60),
+                    Vec2(40, 20)
+                };
+
+                Body* poly = new Body(PolygonShape(vertices), x, y, 2.0);
+                poly->restitution = 0.1;
+                poly->friction = 0.7;
+                bodies.push_back(poly);
                 // bodies[0]->position.x = x;
                 // bodies[0]->position.y = y;
                 break;
@@ -203,11 +213,13 @@ void Application::Update() {
             if (CollisionDetection::isColliding(a, b, contact)) {
                 contact.ResolveCollision();
 
-                Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
-                Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
-                Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF);
-                a->isColliding = true;
-                b->isColliding = true;
+                if (debug) {
+                    Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
+                    Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
+                    Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF);
+                    a->isColliding = true;
+                    b->isColliding = true;
+                }
             }
         }
     }
@@ -248,11 +260,15 @@ void Application::Render() {
 
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*) body->shape;
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, color);
+            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFF00FF00);
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, color); 
+            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00); 
+        }
+        if (body->shape->GetType() == POLYGON) {
+            PolygonShape* polygonShape = (PolygonShape*) body->shape;
+            Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
         }
     }
 
