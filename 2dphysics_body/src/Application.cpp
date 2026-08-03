@@ -11,6 +11,8 @@ bool Application::IsRunning() {
 void Application::Setup() {
     running = Graphics::OpenWindow();
 
+    world = new World(-9.8);
+
     Body* floor = new Body(BoxShape(Graphics::Width() - 50, 50), Graphics::Width() / 2.0, Graphics::Height() - 50, 0.0);
     Body* leftWall = new Body(BoxShape(50, Graphics::Height() - 100), 50, Graphics::Height() / 2.0 - 25, 0.0);
     Body* rightWall = new Body(BoxShape(50, Graphics::Height() - 100), Graphics::Width() - 50, Graphics::Height() / 2.0, 0.0);
@@ -22,6 +24,7 @@ void Application::Setup() {
     bodies.push_back(rightWall);
 
     Body* bigBox = new Body(BoxShape(200, 200), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0);
+    bigBox->SetTexture("./assets/crate.png");
     bigBox->restitution = 0.7;
     bigBox->rotation = 1.4;
     bodies.push_back(bigBox);
@@ -48,23 +51,22 @@ void Application::Input() {
                 if (event.key.keysym.sym == SDLK_d) debug = !debug;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                int x, y;
-                SDL_GetMouseState(&x, &y);
-
-                std::vector<Vec2> vertices = {
-                    Vec2(20, 60),
-                    Vec2(-40, 20),
-                    Vec2(-20, -60),
-                    Vec2(20, -60),
-                    Vec2(40, 20)
-                };
-
-                Body* poly = new Body(PolygonShape(vertices), x, y, 2.0);
-                poly->restitution = 0.1;
-                poly->friction = 0.7;
-                bodies.push_back(poly);
-                // bodies[0]->position.x = x;
-                // bodies[0]->position.y = y;
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    int x,y;
+                    SDL_GetMouseState(&x, &y);
+                    Body* ball = new Body(CircleShape(30), x, y, 1.0);
+                    ball->SetTexture("./assets/basketball.png");
+                    ball->restitution = 0.5;
+                    bodies.push_back(ball);
+                }
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    int x, y;
+                    SDL_GetMouseState(&x, &y);
+                    Body* box = new Body(BoxShape(60,60), x,y, 1.0);
+                    box->SetTexture("./assets/crate.png");
+                    box->restitution = 0.2;
+                    bodies.push_back(box);
+                }
                 break;
 
             // case SDL_MOUSEBUTTONDOWN:
@@ -260,15 +262,30 @@ void Application::Render() {
 
         if (body->shape->GetType() == CIRCLE) {
             CircleShape* circleShape = (CircleShape*) body->shape;
-            Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFF00FF00);
+            if (!debug && body->texture) {
+                Graphics::DrawTexture(body->position.x, body->position.y, circleShape->radius * 2, circleShape->radius * 2, body->rotation, body->texture);
+            }
+            else {
+                Graphics::DrawCircle(body->position.x, body->position.y, circleShape->radius, body->rotation, 0xFF00FF00);
+            }
         }
         if (body->shape->GetType() == BOX) {
             BoxShape* boxShape = (BoxShape*) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00); 
+            if (!debug && body->texture) {
+                Graphics::DrawTexture(body->position.x, body->position.y, boxShape->width, boxShape->height, body->rotation, body->texture);
+            }
+            else {
+                Graphics::DrawPolygon(body->position.x, body->position.y, boxShape->worldVertices, 0xFF00FF00); 
+            }
         }
         if (body->shape->GetType() == POLYGON) {
             PolygonShape* polygonShape = (PolygonShape*) body->shape;
-            Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+            if (!debug) {
+                Graphics::DrawFillPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+            }
+            else {
+                Graphics::DrawPolygon(body->position.x, body->position.y, polygonShape->worldVertices, 0xFF00FF00);
+            }
         }
     }
 
@@ -310,8 +327,9 @@ void Application::Render() {
 }
 
 void Application::Destroy() {
-    for (auto body : bodies) {
-        delete body;
-    }
+    delete world;
+    // for (auto body : bodies) {
+    //     delete body;
+    // }
     Graphics::CloseWindow();
 }

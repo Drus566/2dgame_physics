@@ -2,7 +2,8 @@
 #define APPLICATION_H
 
 #include "./Graphics.h"
-#include "./Physics/Body.h"
+// #include "./Physics/Body.h"
+#include "./Physics/World.h"
 #include <vector>
 
 class Application {
@@ -10,6 +11,8 @@ class Application {
         bool debug = false;
         bool running = false;
         std::vector<Body*> bodies;
+        World* world;
+
         Vec2 pushForce = Vec2(0, 0);
         Vec2 mouseCursor = Vec2(0, 0);
         bool leftMouseButtonDown = false;
