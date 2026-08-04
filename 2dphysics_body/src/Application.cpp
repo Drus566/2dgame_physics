@@ -19,24 +19,19 @@ void Application::Setup() {
     floor->restitution = 0.5;
     leftWall->restitution = 0.2;
     rightWall->restitution = 0.2;
-    bodies.push_back(floor);
-    bodies.push_back(leftWall);
-    bodies.push_back(rightWall);
+    world->AddBody(floor);
+    world->AddBody(leftWall);
+    world->AddBody(rightWall);
 
     Body* bigBox = new Body(BoxShape(200, 200), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 0.0);
     bigBox->SetTexture("./assets/crate.png");
     bigBox->restitution = 0.7;
     bigBox->rotation = 1.4;
-    bodies.push_back(bigBox);
+    world->AddBody(bigBox);
 
-    // Body* ball = new Body(CircleShape(50), Graphics::Width() / 2.0, Graphics::Height() / 2.0, 1.0);
-    // ball->restitution = 0.1;
-    // bodies.push_back(ball);
-
-    // Body* bigBall = new Body(CircleShape(100),100,100,1.0);
-    // Body* smallBall = new Body(CircleShape(50),500,100,1.0);
-    // bodies.push_back(bigBall);
-    // bodies.push_back(smallBall);
+    // Add a force to all world objects
+    Vec2 wind(0.5 * PIXELS_PER_METER, 0.0);
+    world->AddForce(wind);
 } 
 
 void Application::Input() {
@@ -57,7 +52,7 @@ void Application::Input() {
                     Body* ball = new Body(CircleShape(30), x, y, 1.0);
                     ball->SetTexture("./assets/basketball.png");
                     ball->restitution = 0.5;
-                    bodies.push_back(ball);
+                    world->AddBody(ball);
                 }
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     int x, y;
@@ -65,7 +60,7 @@ void Application::Input() {
                     Body* box = new Body(BoxShape(60,60), x,y, 1.0);
                     box->SetTexture("./assets/crate.png");
                     box->restitution = 0.2;
-                    bodies.push_back(box);
+                    world->AddBody(box);
                 }
                 break;
 
@@ -170,94 +165,13 @@ void Application::Update() {
 
     timePreviousFrame = SDL_GetTicks();
 
-    // bodies[0]->AddForce(pushForce);
-
-    // body->acceleration = Vec2(0.0, 9.8 * PIXELS_PER_METER);
-    for (auto body : bodies) {
-    //     // Vec2 wind = Vec2(0.2 * PIXELS_PER_METER, 0.0); // ветер
-    //     // body->AddForce(wind);
-        Vec2 weight = Vec2(0.0, body->mass * 9.8 * PIXELS_PER_METER); // Сила тяжести
-        body->AddForce(weight);
-    //     // body->AddForce(pushForce); // Сила из клавиатуры
-
-    //     // Vec2 drag = Force::GenerateDragForce(*body, 0.003);
-    //     // body->AddForce(drag);
-
-    //     Vec2 weight = Vec2(0.0, body->invMass * 9.8 * PIXELS_PER_METER);
-    //     body->AddForce(weight);
-
-    //     Vec2 wind = Vec2(2.0 * PIXELS_PER_METER, 0.0);
-    //     body->AddForce(wind);
-
-    //     // // Только если в воде
-    //     // // if (body->position.y >= liquid.y) {
-    //     // //     Vec2 drag = Force::GenerateDragForce(*body, 0.01);
-    //     // //     body->AddForce(drag);
-    //     // // }
-
-    //     // float torque = 200;
-    //     // body->AddTorque(torque);
-    }
-
-    for (auto body : bodies) {
-        body->Update(deltaTime);
-    }
-
-    // Check all rigidbodies with the other rigidbodies for collision
-    for (int i = 0; i <= bodies.size() - 1; i++) {
-        for (int j = i + 1; j < bodies.size(); j++) {
-            // TODO: Check bodies[i] with bodies[j]
-            Body* a = bodies[i];
-            Body* b = bodies[j];
-            a->isColliding = false;
-            b->isColliding = false;
-            Contact contact;
-            if (CollisionDetection::isColliding(a, b, contact)) {
-                contact.ResolveCollision();
-
-                if (debug) {
-                    Graphics::DrawFillCircle(contact.start.x, contact.start.y, 3, 0xFFFF00FF);
-                    Graphics::DrawFillCircle(contact.end.x, contact.end.y, 3, 0xFFFF00FF);
-                    Graphics::DrawLine(contact.start.x, contact.start.y, contact.start.x + contact.normal.x * 15, contact.start.y + contact.normal.y * 15, 0xFFFF00FF);
-                    a->isColliding = true;
-                    b->isColliding = true;
-                }
-            }
-        }
-    }
-
-    // // Проверка границ окна
-    // for (auto body : bodies) {
-    //     if (body->shape->GetType() == CIRCLE) {
-    //         CircleShape* circleShape = (CircleShape*) body->shape;
-    //         // Если о левый борт
-    //         if (body->position.x - circleShape->radius <= 0) {
-    //             body->position.x = circleShape->radius;
-    //             body->velocity.x *= -0.9; // меняем направление скорости с помощью знака -
-    //         }
-    //         // Если о правый борт 
-    //         else if (body->position.x + circleShape->radius >= Graphics::Width()) {
-    //             body->position.x = Graphics::Width() - circleShape->radius;
-    //             body->velocity.x *= -0.9; 
-    //         }
-    //         // Если о потолок
-    //         if (body->position.y - circleShape->radius <= 0) {
-    //             body->position.y = circleShape->radius;
-    //             body->velocity.y *= -0.9;
-    //         }
-    //         // Если о землю
-    //         else if (body->position.y + circleShape->radius >= Graphics::Height()) {
-    //             body->position.y = Graphics::Height() - circleShape->radius;
-    //             body->velocity.y *= -0.9; 
-    //         }
-    //     }
-    // }
+    world->Update(deltaTime);
 }
 
 void Application::Render() {
     // Graphics::ClearScreen(0xFF0F0721);
 
-    for (auto body: bodies) {
+    for (auto body: world->GetBodies()) {
         Uint32 color = body->isColliding ? 0xFF0000FF : 0xFFFFFFFF;
 
         if (body->shape->GetType() == CIRCLE) {
