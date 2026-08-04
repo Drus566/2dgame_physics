@@ -53,7 +53,9 @@ void World::Update(float dt) {
     }
 
     // Collision detection and resolution for all bodies of the world
-    CheckCollisions();
+    for (int n = 0; n < 10; n++) {
+        CheckCollisions();
+    }
 }
 
 void World::CheckCollisions() {

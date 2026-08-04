@@ -16,6 +16,10 @@ Shape* CircleShape::Clone() const {
     return new CircleShape(this->radius);
 }
 
+void CircleShape::UpdateVertices(float angle, const Vec2& position) {
+    return; // Circles don't have vertices... nothing do here
+}
+
 float CircleShape::GetMomentOfInertia() const {
     // 1/2 * r^2
     return 0.5 * (radius * radius);
